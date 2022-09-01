@@ -1,8 +1,9 @@
-import sys
+import itertools
 import typing
 import string
 import numpy as np
 from collections import defaultdict
+from dataclasses import dataclass, field
 
 
 def del_punctuation(s: str) -> str:
@@ -23,23 +24,14 @@ def convert_list(ls: list[str]) -> np.ndarray:
     return np.array([[elm, ls.count(elm)/len(ls)] for elm in unique_elms])
 
 
-def get_words_from_lines(lines: typing.Iterable):
-    for line in lines:
-        yield from get_words(line)
-
-
+@dataclass(init=True, slots=True)
 class Model:
-    __slots__ = ['data']
-
-    def __init__(self):
-        self.data = defaultdict(list)
+    data: defaultdict = field(default_factory=lambda: defaultdict(list))
 
     def train(self, lines: typing.Iterable):
-        words_gen = get_words_from_lines(lines)
+        words_gen = itertools.chain(*(get_words(line) for line in lines))
         prefix = (next(words_gen), next(words_gen))
         for word in words_gen:
-            if prefix not in self.data:
-                self.data[prefix] = list()
             self.data[prefix].append(word)
             prefix = (prefix[1], word)
 

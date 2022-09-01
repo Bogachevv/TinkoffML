@@ -7,6 +7,7 @@ import typing
 import model
 from generate import generate
 
+
 def parse_args() -> typing.Tuple[str, str]:
     """
     Parse cmd args
@@ -34,6 +35,8 @@ def get_files(path: str | None) -> str | None:
 def get_fd(path: str | None) -> typing.TextIO:
     return sys.stdin if path is None else open(path, "r", encoding="utf-8")
 
+# TODO: lines stream from stdin\file
+
 
 def main():
     inp_dir, model_path = parse_args()
@@ -41,7 +44,6 @@ def main():
     m = model.Model()
     with open("texts\\text3.txt", "r", encoding="utf-8") as f:
         m.train(f.readlines())
-    prefix = ("Помню", "будучи")
     for w in generate(m):
         print(w, end=' ')
 

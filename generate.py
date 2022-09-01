@@ -1,6 +1,5 @@
 from model import Model
 import typing
-import numpy as np
 import random
 
 
@@ -12,3 +11,5 @@ def generate(model: Model):
         w = model.get_next(prefix)
         prefix = (prefix[1], w)
         yield w
+
+# TODO: user interface
