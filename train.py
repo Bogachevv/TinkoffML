@@ -25,27 +25,30 @@ def parse_args() -> typing.Tuple[str, str]:
     return args.inp_dir, args.model
 
 
-def get_files(path: str | None) -> str | None:
+def get_files(path: str):
+    yield from (f"{path}\\{file}" for file in os.listdir(path) if '.txt' in file)
+
+
+def get_lines(path: str | None = None):
     if path is None:
-        yield None
+        line = input("Input text: ")
+        while line:
+            yield line
+            line = input()
     else:
-        yield from (file for file in os.listdir(path) if '.txt' in file)
-
-
-def get_fd(path: str | None) -> typing.TextIO:
-    return sys.stdin if path is None else open(path, "r", encoding="utf-8")
-
-# TODO: lines stream from stdin\file
+        for fp in get_files(path):
+            with open(fp, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            yield from lines
 
 
 def main():
     inp_dir, model_path = parse_args()
     print()
     m = model.Model()
-    with open("texts\\text3.txt", "r", encoding="utf-8") as f:
-        m.train(f.readlines())
-    for w in generate(m):
-        print(w, end=' ')
+    m.train(get_lines(inp_dir))
+    print(m.data)
+    model.serialize_model(m, model_path)
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import string
 import numpy as np
 from collections import defaultdict
 from dataclasses import dataclass, field
+import pickle
 
 
 def del_punctuation(s: str) -> str:
@@ -44,3 +45,15 @@ class Model:
             raise RuntimeError(f"Prefix not found\n{self.data.keys()=}\n{prefix=}")
         # print(f"DEBUG: {self.data[prefix][:, 0]=}\n{self.data[prefix][:, 1]=}")
         return np.random.choice(self.data[prefix][:, 0], 1, p=[float(p) for p in self.data[prefix][:, 1]])[0]
+
+
+def serialize_model(m: Model, path: str):
+    print("Serialization")
+    with open(path, "wb") as f:
+        pickle.dump(m, file=f)
+
+
+def deserialize_model(path: str) -> Model:
+    print("Deserialization")
+    with open(path, "rb") as f:
+        return pickle.load(file=f)
