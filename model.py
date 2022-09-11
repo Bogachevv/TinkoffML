@@ -30,7 +30,7 @@ def calc_probs(ls: list[str]) -> np.ndarray:
 class Model:
     data: defaultdict = field(default_factory=lambda: defaultdict(list))
 
-    def fit(self, lines: typing.Iterable):
+    def train(self, lines: typing.Iterable):
         words_gen = itertools.chain(*(get_words(line) for line in lines))
         prefix = (next(words_gen), next(words_gen))
         for word in words_gen:
@@ -40,7 +40,7 @@ class Model:
         for key in self.data:
             self.data[key] = calc_probs(self.data[key])
 
-    def generate(self, prefix: typing.Tuple[str, str]) -> str:
+    def get_next(self, prefix: typing.Tuple[str, str]) -> str:
         prefix = tuple(s.lower() for s in prefix)
         if prefix not in self.data:
             raise RuntimeError(f"Prefix not found\n{self.data.keys()=}\n{prefix=}")

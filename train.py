@@ -37,7 +37,7 @@ def get_lines(path: str | None = None):
 def main():
     inp_dir, model_path = parse_args()
     m = model.Model()
-    m.fit(get_lines(inp_dir))
+    m.train(get_lines(inp_dir))
     model.serialize_model(m, model_path)
 
 
