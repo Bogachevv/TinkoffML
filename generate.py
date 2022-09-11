@@ -33,7 +33,7 @@ def generate(model: Model, prefix: typing.Tuple[str, str] | None = None):
     while True:
         if prefix not in model.data:
             break
-        w = model.get_next(prefix)
+        w = model.generate(prefix)
         prefix = (prefix[1], w)
         yield w
 
