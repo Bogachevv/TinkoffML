@@ -6,9 +6,30 @@ import typing
 from model import Model, deserialize_model
 
 
+def build_prefix(model: Model) -> tuple[str, str]:
+    return random.choice(list(model.data.keys()))
+
+
+def reformat_prefix(prefix: tuple[str, str], model: Model) -> tuple[str, str]:
+    if prefix in model.data:
+        return prefix
+    new_prefix_list = [key for key in model.data.keys() if key[0] == prefix[-1]]
+    if not new_prefix_list:
+        return build_prefix(model)
+    return random.choice(new_prefix_list)
+
+
 def generate(model: Model, prefix: typing.Tuple[str, str] | None = None):
-    prefix = random.choice(list(model.data.keys())) if prefix is None else prefix
-    yield from prefix
+    if prefix is None:
+        prefix = build_prefix(model)
+        yield from prefix
+    elif prefix not in model.data:
+        yield from prefix[:-1]
+        prefix = reformat_prefix(prefix, model)
+        yield from prefix
+    else:
+        yield from prefix
+
     while True:
         if prefix not in model.data:
             break
