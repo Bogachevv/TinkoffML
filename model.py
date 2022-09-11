@@ -1,23 +1,24 @@
 import itertools
-import typing
+import pickle
 import string
-import numpy as np
+import typing
 from collections import defaultdict
 from dataclasses import dataclass, field
-import pickle
+
+import numpy as np
 
 
 def del_punctuation(s: str) -> str:
-    return s.translate(str.maketrans({key: None for key in string.punctuation}))
+    punctuation = string.punctuation + "«»–…"
+    return s.translate(str.maketrans({key: None for key in punctuation}))
 
 
 def get_words(line: str) -> list[str]:
     line = del_punctuation(line)
-    return [s for s in line.strip().lower().split()]
+    return line.strip().lower().split()
 
 
-# TODO: change signature
-def convert_list(ls: list[str]) -> np.ndarray:
+def calc_probs(ls: list[str]) -> np.ndarray:
     """
     :return: np.array([...,[elm_i, p_i],...])
     """
@@ -37,23 +38,20 @@ class Model:
             prefix = (prefix[1], word)
 
         for key in self.data:
-            self.data[key] = convert_list(self.data[key])
+            self.data[key] = calc_probs(self.data[key])
 
     def get_next(self, prefix: typing.Tuple[str, str]) -> str:
         prefix = tuple(s.lower() for s in prefix)
         if prefix not in self.data:
             raise RuntimeError(f"Prefix not found\n{self.data.keys()=}\n{prefix=}")
-        # print(f"DEBUG: {self.data[prefix][:, 0]=}\n{self.data[prefix][:, 1]=}")
         return np.random.choice(self.data[prefix][:, 0], 1, p=[float(p) for p in self.data[prefix][:, 1]])[0]
 
 
 def serialize_model(m: Model, path: str):
-    print("Serialization")
     with open(path, "wb") as f:
         pickle.dump(m, file=f)
 
 
 def deserialize_model(path: str) -> Model:
-    print("Deserialization")
     with open(path, "rb") as f:
         return pickle.load(file=f)

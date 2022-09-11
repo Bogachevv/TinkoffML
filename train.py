@@ -1,11 +1,8 @@
-import os
-import sys
-import string
-import numpy as np
 import argparse
+import os
 import typing
+
 import model
-from generate import generate
 
 
 def parse_args() -> typing.Tuple[str, str]:
@@ -14,14 +11,9 @@ def parse_args() -> typing.Tuple[str, str]:
     :return: (inp_dir: str, model: str)
     """
     parser = argparse.ArgumentParser()
-    # TODO:
-    #   Write help
-    parser.add_argument('--input-dir', help='inp help here', dest="inp_dir", default=None, type=str)
-    parser.add_argument('--model', help='model help here', dest="model", default="model.pic", type=str)
+    parser.add_argument('--input-dir', help='Path to folder with .txt files', dest="inp_dir", default=None, type=str)
+    parser.add_argument('--model', help='Path to model dump', dest="model", default="model.pic", type=str)
     args = parser.parse_args()
-    print(f"{args=}")
-    print(f"{args.inp_dir=}")
-    print(f"{args.model=}")
     return args.inp_dir, args.model
 
 
@@ -44,10 +36,8 @@ def get_lines(path: str | None = None):
 
 def main():
     inp_dir, model_path = parse_args()
-    print()
     m = model.Model()
     m.train(get_lines(inp_dir))
-    print(m.data)
     model.serialize_model(m, model_path)
 
 
